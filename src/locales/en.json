@@ -26,7 +26,26 @@
     "spacing": "Spacing",
     "border": "Border",
     "ratio": "Layout",
+    "cover": "Cover",
     "watermark": "Watermark"
+  },
+  "cover": {
+    "enabled": "Front cover",
+    "brand": "Brand / top",
+    "brandPlaceholder": "e.g. NASDAQ",
+    "title": "Headline / center",
+    "titlePlaceholder": "Big word",
+    "date": "Date",
+    "dateAuto": "Today",
+    "dateNone": "Hide",
+    "bg": "Macaron background",
+    "backEnabled": "Back cover",
+    "backBrand": "Brand",
+    "backBrandPlaceholder": "Optional, reuse front",
+    "backText": "Headline",
+    "backTextPlaceholder": "e.g. End",
+    "backSub": "Subtitle",
+    "backSubPlaceholder": "Credit or closing line"
   },
   "typo": {
     "h1": "Heading 1",
@@ -51,7 +70,11 @@
   },
   "watermark": {
     "text": "Text",
-    "placeholder": "Leave empty to disable"
+    "placeholder": "Leave empty to disable",
+    "style": "Style",
+    "color": "Color",
+    "opacity": "Opacity",
+    "size": "Size"
   },
   "actions": {
     "reset": "Reset Defaults",
@@ -69,6 +92,7 @@
     "shareFail": "Copy failed, please copy the URL manually",
     "imageTooLarge": "Image is too tall for a single page",
     "imageTooLargeHint": "Please use a smaller image or switch to a taller card format such as Story.",
+    "localImageHint": "Local CodiMD image URLs cannot load on HTTPS. Paste the image file, or use a publicly reachable image URL.",
     "dismiss": "OK"
   },
   "theme": {

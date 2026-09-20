@@ -14,8 +14,11 @@
     "wide": "16:9 宽屏"
   },
   "editor": {
-    "placeholder": "# 在此输入标题\u000a\u000a用 Markdown 编写内容...\u000a\u000a- **粗体** 和 *斜体*\u000a- 列表和 > 引用\u000a\u000a用 === 单独一行强制分页\u000a用 --- 渲染分割线",
-    "emptyPreview": "输入 Markdown 即可预览卡片"
+    "placeholder": "# 在此输入标题\u000a\u000a用 Markdown 编写内容...\u000a\u000a- **粗体** 和 *斜体*\u000a- 选中文字后点上方色块即可高亮\u000a- 列表和 > 引用\u000a\u000a用 === 单独一行强制分页\u000a用 --- 渲染分割线",
+    "emptyPreview": "输入 Markdown 即可预览卡片",
+    "highlight": "高亮",
+    "clearHighlight": "清除高亮",
+    "highlightPlaceholder": "高亮文字"
   },
   "drawer": {
     "title": "样式设置",
@@ -26,7 +29,26 @@
     "spacing": "间距",
     "border": "边框",
     "ratio": "画幅",
+    "cover": "封面",
     "watermark": "水印"
+  },
+  "cover": {
+    "enabled": "启用封面",
+    "brand": "品牌 / 上",
+    "brandPlaceholder": "如：纳指",
+    "title": "大字 / 中",
+    "titlePlaceholder": "如：闷着",
+    "date": "日期",
+    "dateAuto": "今天",
+    "dateNone": "隐藏",
+    "bg": "马卡龙底色",
+    "backEnabled": "启用封底",
+    "backBrand": "品牌",
+    "backBrandPlaceholder": "可留空沿用封面",
+    "backText": "大字",
+    "backTextPlaceholder": "如：完",
+    "backSub": "副文",
+    "backSubPlaceholder": "署名或收束语"
   },
   "typo": {
     "h1": "标题",
@@ -51,7 +73,11 @@
   },
   "watermark": {
     "text": "文字",
-    "placeholder": "留空关闭"
+    "placeholder": "留空关闭",
+    "style": "样式模版",
+    "color": "颜色",
+    "opacity": "不透明度",
+    "size": "大小"
   },
   "actions": {
     "reset": "重置默认",
@@ -69,6 +95,7 @@
     "shareFail": "复制失败，请手动复制地址栏",
     "imageTooLarge": "图片高度超出单页范围",
     "imageTooLargeHint": "请使用更小的图片，或切换为长图等更高的卡片格式",
+    "localImageHint": "本地 CodiMD 图片链在 HTTPS 下无法直接加载，请直接粘贴图片文件，或使用可公网访问的图片链接",
     "dismiss": "知道了"
   },
   "theme": {

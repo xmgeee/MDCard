@@ -1,4 +1,5 @@
 import { applyCardVars, availableHeight } from './settings.js';
+import { preprocessHighlights } from './highlight.js';
 
 const UNSPLITTABLE_TAGS = new Set(['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HR']);
 
@@ -32,7 +33,7 @@ export function paginateMarkdown(raw, fmt, s, onWarn, tplClass) {
     const maxH = availableHeight(fmt, s);
 
     for (const sec of sections) {
-        const secHtml = marked.parse(sec);
+        const secHtml = marked.parse(preprocessHighlights(sec));
         const secPages = paginateSection(contentBox, secHtml, maxH, onWarn);
         pages.push(...secPages);
     }

@@ -26,7 +26,26 @@
     "spacing": "間隔",
     "border": "枠線",
     "ratio": "レイアウト",
+    "cover": "カバー",
     "watermark": "ウォーターマーク"
+  },
+  "cover": {
+    "enabled": "表紙を有効",
+    "brand": "ブランド / 上",
+    "brandPlaceholder": "例：NASDAQ",
+    "title": "大文字 / 中",
+    "titlePlaceholder": "大きな語",
+    "date": "日付",
+    "dateAuto": "今日",
+    "dateNone": "非表示",
+    "bg": "マカロン背景",
+    "backEnabled": "裏表紙を有効",
+    "backBrand": "ブランド",
+    "backBrandPlaceholder": "空なら表紙を流用",
+    "backText": "大文字",
+    "backTextPlaceholder": "例：完",
+    "backSub": "サブ",
+    "backSubPlaceholder": "署名や締めの一文"
   },
   "typo": {
     "h1": "見出し",
@@ -51,7 +70,11 @@
   },
   "watermark": {
     "text": "テキスト",
-    "placeholder": "空で無効"
+    "placeholder": "空で無効",
+    "style": "スタイル",
+    "color": "色",
+    "opacity": "不透明度",
+    "size": "サイズ"
   },
   "actions": {
     "reset": "デフォルトに戻す",

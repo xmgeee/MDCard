@@ -60,7 +60,7 @@ export function valueToLevel(key, value) {
 
 /**
  * Default style settings for new cards.
- * @type {{ h1: number, h2: number, h3: number, bodyFs: number, lh: number, bg: string, headC: string, bodyC: string, pad: number, my: number, bw: number, bc: string, br: number, watermark: string }}
+ * @type {{ h1: number, h2: number, h3: number, bodyFs: number, lh: number, bg: string, headC: string, bodyC: string, pad: number, my: number, bw: number, bc: string, br: number, watermark: string, wmStyle: string, wmColor: string, wmOpacity: number, wmSize: string }}
  */
 export const DEFAULTS = {
     h1: 20, h2: 18, h3: 16,
@@ -70,4 +70,18 @@ export const DEFAULTS = {
     bw: 0, bc: '#E0E0E0',
     br: 0,
     watermark: 'MDCard',
+    wmStyle: 'badge',
+    wmColor: 'auto',
+    wmOpacity: 0.32,
+    wmSize: 'md',
+    // Large-text cover / back cover (macaron)
+    coverEnabled: false,
+    coverBrand: '',
+    coverTitle: '',
+    coverDate: 'auto', // auto | none | YYYY-MM-DD
+    coverBg: 'auto',   // auto | pink | lilac | sky | mint | apricot | cream | #hex
+    backEnabled: false,
+    backBrand: '',
+    backText: '',
+    backSub: '',
 };

@@ -131,6 +131,68 @@ body {
     padding: 4px;
 }
 
+.mc__editor-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    padding: 8px 12px 4px;
+}
+
+.mc__editor-tools-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--mc-text-muted);
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+}
+
+.mc__hl-swatches {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.mc__hl-swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1.5px solid rgba(0, 0, 0, 0.12);
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    background: var(--hl-color, #ffe58f);
+}
+
+.mc__hl-swatch:hover {
+    transform: scale(1.12);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.mc__hl-swatch:focus-visible {
+    outline: none;
+    box-shadow: var(--mc-focus-ring);
+}
+
+.mc__hl-clear {
+    all: unset;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: var(--mc-text-muted);
+    padding: 4px 8px;
+    border-radius: var(--mc-radius-sm);
+    flex-shrink: 0;
+}
+
+.mc__hl-clear:hover {
+    color: var(--mc-text-secondary);
+    background: var(--mc-glass-hover);
+}
+
 .mc__editor-input {
     flex: 1;
     width: 100%;

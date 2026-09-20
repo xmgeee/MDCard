@@ -1,4 +1,5 @@
 import { FORMATS, DEFAULTS } from './config.js';
+import { resolveWatermarkRgb } from './watermark.js';
 
 /**
  * Create a fresh copy of the default card settings.
@@ -18,25 +19,16 @@ export function cloneSettings(s) {
 }
 
 /**
- * Calculate the relative luminance of a hex color (sRGB).
- * @param {string} hex - Hex color string (e.g. '#ff0000')
- * @returns {number} Luminance value (0-1)
- */
-function bgLuminance(hex) {
-    const s = hex.replace('#', '');
-    const r = parseInt(s.slice(0, 2), 16);
-    const g = parseInt(s.slice(2, 4), 16);
-    const b = parseInt(s.slice(4, 6), 16);
-    return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-}
-
-/**
  * Apply card style settings as CSS custom properties on a card element.
  * Sets background, text colors, font sizes, spacing, border, and watermark color.
  * @param {HTMLElement} cardEl - The card container element
  * @param {typeof DEFAULTS} s - Style settings object
  */
 export function applyCardVars(cardEl, s) {
+    const opacity = clamp(s.wmOpacity ?? 0.32, 0.12, 0.6);
+    const ink = resolveWatermarkRgb(s.wmColor || 'auto', s.bg);
+    const sizeMap = { sm: '0.7', md: '0.85', lg: '1.05' };
+    const sizeScale = sizeMap[s.wmSize] || sizeMap.md;
     const map = {
         '--c-bg': s.bg,
         '--c-head': s.headC,
@@ -51,13 +43,17 @@ export function applyCardVars(cardEl, s) {
         '--c-bw': s.bw + 'px',
         '--c-bc': s.bc,
         '--c-br': s.br + 'px',
-        '--mc-watermark-c': bgLuminance(s.bg) > 0.5
-            ? 'rgba(0,0,0,0.12)'
-            : 'rgba(255,255,255,0.15)',
+        '--wm-opacity': String(opacity),
+        '--wm-scale': sizeScale,
+        '--mc-watermark-c': `rgba(${ink},${opacity})`,
     };
     for (const [prop, val] of Object.entries(map)) {
         cardEl.style.setProperty(prop, val);
     }
+}
+
+function clamp(n, min, max) {
+    return Math.min(max, Math.max(min, Number(n) || min));
 }
 
 /**
@@ -66,12 +62,13 @@ export function applyCardVars(cardEl, s) {
  * @param {typeof DEFAULTS} s - Style settings object
  * @returns {number} Available height in CSS pixels
  */
-const WATERMARK_HEIGHT_ESTIMATE = 20;
-
 export function availableHeight(fmt, s) {
     const cfg = FORMATS[fmt];
     const borderOff = s.bw * 2;
     const padOff = (s.pad * 2) + (s.my * 2);
-    const watermarkOff = s.watermark ? WATERMARK_HEIGHT_ESTIMATE : 0;
+    let watermarkOff = 0;
+    if (s.watermark) {
+        watermarkOff = 22;
+    }
     return cfg.ph - padOff - borderOff - watermarkOff;
 }

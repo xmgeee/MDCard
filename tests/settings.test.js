@@ -73,7 +73,7 @@ describe('settings', () => {
 
     it('should set watermark color dark for light backgrounds', () => {
       const el = document.createElement('div');
-      const settings = { ...DEFAULTS, bg: '#ffffff' };
+      const settings = { ...DEFAULTS, bg: '#ffffff', wmColor: 'auto' };
       applyCardVars(el, settings);
       const wmColor = el.style.getPropertyValue('--mc-watermark-c');
       expect(wmColor).toContain('rgba(0,0,0');
@@ -81,7 +81,7 @@ describe('settings', () => {
 
     it('should set watermark color light for dark backgrounds', () => {
       const el = document.createElement('div');
-      const settings = { ...DEFAULTS, bg: '#000000' };
+      const settings = { ...DEFAULTS, bg: '#000000', wmColor: 'auto' };
       applyCardVars(el, settings);
       const wmColor = el.style.getPropertyValue('--mc-watermark-c');
       expect(wmColor).toContain('rgba(255,255,255');
@@ -89,10 +89,18 @@ describe('settings', () => {
 
     it('should set watermark color dark for mid-brightness backgrounds', () => {
       const el = document.createElement('div');
-      const settings = { ...DEFAULTS, bg: '#888888' };
+      const settings = { ...DEFAULTS, bg: '#888888', wmColor: 'auto' };
       applyCardVars(el, settings);
       const wmColor = el.style.getPropertyValue('--mc-watermark-c');
       expect(wmColor).toContain('rgba(0,0,0');
+    });
+
+    it('should use fixed watermark color when preset selected', () => {
+      const el = document.createElement('div');
+      const settings = { ...DEFAULTS, bg: '#ffffff', wmColor: 'blue', wmOpacity: 0.4 };
+      applyCardVars(el, settings);
+      const wmColor = el.style.getPropertyValue('--mc-watermark-c');
+      expect(wmColor).toBe('rgba(37,99,235,0.4)');
     });
   });
 

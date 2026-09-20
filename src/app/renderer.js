@@ -51,8 +51,20 @@ export function dataUrlToBlob(dataUrl) {
  * @param {string} filename - Suggested filename for the download
  */
 export function triggerDownload(url, filename) {
+    let href = url;
+    let revoke = null;
+    // Safari / 部分移动浏览器对 data: URL 的 download 支持很差，统一转成 blob:
+    if (typeof url === 'string' && url.startsWith('data:')) {
+        const blob = dataUrlToBlob(url);
+        href = URL.createObjectURL(blob);
+        revoke = href;
+    }
     const a = document.createElement('a');
     a.download = filename;
-    a.href = url;
+    a.href = href;
+    a.rel = 'noopener';
+    document.body.appendChild(a);
     a.click();
+    a.remove();
+    if (revoke) setTimeout(() => URL.revokeObjectURL(revoke), 4000);
 }

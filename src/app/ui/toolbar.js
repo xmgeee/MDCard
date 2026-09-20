@@ -14,6 +14,10 @@ import { persist } from '../storage.js';
 import { saveDraft, getCurrentId, setCurrentId, clearCurrentId, getAutoSave } from '../draft.js';
 import { exportImages } from '../image-upload.js';
 import { openDraftsPanel } from './drafts-panel.js';
+import { HIGHLIGHT_COLORS, applyHighlightToSelection } from '../highlight.js';
+import { WATERMARK_STYLES, WATERMARK_PRESETS, WATERMARK_COLORS } from '../watermark.js';
+import { MACARON_PRESETS } from '../cover.js';
+import { syncCoverPanelVisibility } from '../store.js';
 import JSZip from 'jszip';
 
 function debounce(fn, ms) {
@@ -58,11 +62,10 @@ export async function exportAll() {
             try {
                 await navigator.share({ files: shareFiles });
                 showToast(t('toast.exportSuccess', { count: images.length, format: 'PNG' }));
-            } catch (shareErr) {
-                // User cancelled or share failed — fall back to download
-                if (shareErr.name !== 'AbortError') {
-                    fallbackDownload(images, ts);
-                }
+            } catch {
+                // 取消分享或分享失败时，仍走下载，避免「生成了但没有任何文件」
+                fallbackDownload(images, ts);
+                showToast(t('toast.exportSuccess', { count: images.length, format: 'PNG' }));
             }
         } else {
             fallbackDownload(images, ts);
@@ -124,7 +127,7 @@ export function shareConfig() {
 }
 
 export function bindEvents() {
-    const debouncedRefresh = debounce(refresh, 250);
+    const debouncedRefresh = debounce(() => { void refresh(); }, 400);
 
     const performAutoSave = async () => {
         const md = dom.markdown.value;
@@ -252,11 +255,12 @@ export function bindEvents() {
         });
     }
 
-    dom.watermark.addEventListener('input', debouncedRefresh);
-
     updateBorderColorState(store.opts.bw);
 
     setupImageUpload(dom.markdown, debouncedRefresh, checkImageFits);
+    setupHighlightPanel();
+    setupWatermarkPanel(debouncedRefresh);
+    setupCoverPanel(debouncedRefresh);
 
     window.addEventListener('beforeunload', () => {
         persist();
@@ -320,6 +324,197 @@ export function bindEvents() {
             const locale = opt.dataset.lang;
             setLocale(locale);
             markMobileLangActive(locale);
+        });
+    }
+}
+
+function setupWatermarkPanel(debouncedRefresh) {
+    const stylesEl = document.getElementById('mc-wm-styles');
+    const presetsEl = document.getElementById('mc-wm-presets');
+
+    if (stylesEl) {
+        stylesEl.innerHTML = WATERMARK_STYLES.map(s => `
+            <button type="button" class="mc__wm-style${store.opts.wmStyle === s.id ? ' mc__wm-style--active' : ''}" data-wm-style="${s.id}">
+                <span class="mc__wm-style-name">${s.name}</span>
+                <span class="mc__wm-style-desc">${s.desc}</span>
+            </button>
+        `).join('');
+
+        stylesEl.addEventListener('click', (e) => {
+            const btn = e.target.closest('.mc__wm-style');
+            if (!btn) return;
+            const id = btn.dataset.wmStyle;
+            if (dom.wmStyle) dom.wmStyle.value = id;
+            store.opts.wmStyle = id;
+            stylesEl.querySelectorAll('.mc__wm-style').forEach(el => {
+                el.classList.toggle('mc__wm-style--active', el.dataset.wmStyle === id);
+            });
+            debouncedRefresh();
+        });
+    }
+
+    if (presetsEl) {
+        presetsEl.innerHTML = WATERMARK_PRESETS.map(text => `
+            <button type="button" class="mc__wm-preset" data-wm-text="${text.replace(/"/g, '&quot;')}">${text}</button>
+        `).join('');
+        presetsEl.addEventListener('click', (e) => {
+            const btn = e.target.closest('.mc__wm-preset');
+            if (!btn || !dom.watermark) return;
+            dom.watermark.value = btn.dataset.wmText || '';
+            debouncedRefresh();
+        });
+    }
+
+    const colorsEl = document.getElementById('mc-wm-colors');
+    if (colorsEl) {
+        colorsEl.innerHTML = WATERMARK_COLORS.map(c => {
+            const style = c.hex
+                ? `background:${c.hex}`
+                : 'background:linear-gradient(135deg,#1a1a1a 50%,#ffffff 50%)';
+            const active = (store.opts.wmColor || 'auto') === c.id ? ' mc__wm-color--active' : '';
+            return `<button type="button" class="mc__wm-color${active}" data-wm-color="${c.id}" style="${style}" title="${c.label}" aria-label="${c.label}"></button>`;
+        }).join('');
+        colorsEl.addEventListener('click', (e) => {
+            const btn = e.target.closest('.mc__wm-color');
+            if (!btn) return;
+            const id = btn.dataset.wmColor;
+            if (dom.wmColor) dom.wmColor.value = id;
+            store.opts.wmColor = id;
+            colorsEl.querySelectorAll('.mc__wm-color').forEach(el => {
+                el.classList.toggle('mc__wm-color--active', el.dataset.wmColor === id);
+            });
+            debouncedRefresh();
+        });
+    }
+
+    if (dom.wmOpacity) {
+        const syncOpacityLabel = () => {
+            if (dom.wmOpacityVal) dom.wmOpacityVal.textContent = dom.wmOpacity.value + '%';
+        };
+        syncOpacityLabel();
+        dom.wmOpacity.addEventListener('input', () => {
+            syncOpacityLabel();
+            debouncedRefresh();
+        });
+    }
+
+    const sizeGroup = document.getElementById('mc-wm-size');
+    if (sizeGroup) {
+        sizeGroup.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-wm-size]');
+            if (!btn) return;
+            const size = btn.dataset.wmSize;
+            if (dom.wmSize) dom.wmSize.value = size;
+            store.opts.wmSize = size;
+            sizeGroup.querySelectorAll('.mc__seg-btn').forEach(el => {
+                el.classList.toggle('active', el.dataset.wmSize === size);
+            });
+            debouncedRefresh();
+        });
+    }
+
+    if (dom.watermark) {
+        dom.watermark.addEventListener('input', debouncedRefresh);
+    }
+}
+
+function setupCoverPanel(debouncedRefresh) {
+    const bgsEl = document.getElementById('mc-cover-bgs');
+    if (bgsEl) {
+        bgsEl.innerHTML = MACARON_PRESETS.map(p => {
+            const style = p.hex ? `style="--swatch:${p.hex}"` : '';
+            const active = (store.opts.coverBg || 'auto') === p.id ? ' mc__cover-bg--active' : '';
+            return `<button type="button" class="mc__cover-bg${active}" data-cover-bg="${p.id}" title="${p.label}" aria-label="${p.label}" ${style}></button>`;
+        }).join('');
+
+        bgsEl.addEventListener('click', (e) => {
+            const btn = e.target.closest('.mc__cover-bg');
+            if (!btn) return;
+            const id = btn.dataset.coverBg;
+            if (dom.coverBg) dom.coverBg.value = id;
+            store.opts.coverBg = id;
+            bgsEl.querySelectorAll('.mc__cover-bg').forEach(el => {
+                el.classList.toggle('mc__cover-bg--active', el.dataset.coverBg === id);
+            });
+            debouncedRefresh();
+        });
+    }
+
+    const dateMode = document.getElementById('mc-cover-date-mode');
+    if (dateMode) {
+        dateMode.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-cover-date]');
+            if (!btn) return;
+            const mode = btn.dataset.coverDate;
+            if (dom.coverDate) dom.coverDate.value = mode;
+            store.opts.coverDate = mode;
+            dateMode.querySelectorAll('.mc__seg-btn').forEach(el => {
+                el.classList.toggle('active', el.dataset.coverDate === mode);
+            });
+            debouncedRefresh();
+        });
+    }
+
+    const togglePair = [
+        [dom.coverEnabled, () => {
+            store.opts.coverEnabled = !!(dom.coverEnabled && dom.coverEnabled.checked);
+            syncCoverPanelVisibility();
+            debouncedRefresh();
+        }],
+        [dom.backEnabled, () => {
+            store.opts.backEnabled = !!(dom.backEnabled && dom.backEnabled.checked);
+            syncCoverPanelVisibility();
+            debouncedRefresh();
+        }],
+    ];
+    for (const [el, handler] of togglePair) {
+        if (el) el.addEventListener('change', handler);
+    }
+
+    const textInputs = [
+        [dom.coverBrand, 'coverBrand'],
+        [dom.coverTitle, 'coverTitle'],
+        [dom.backBrand, 'backBrand'],
+        [dom.backText, 'backText'],
+        [dom.backSub, 'backSub'],
+    ];
+    for (const [el, key] of textInputs) {
+        if (!el) continue;
+        el.addEventListener('input', () => {
+            store.opts[key] = el.value;
+            debouncedRefresh();
+        });
+    }
+
+    syncCoverPanelVisibility();
+}
+
+function setupHighlightPanel() {
+    const swatches = document.getElementById('mc-hl-swatches');
+    const clearBtn = document.getElementById('mc-hl-clear');
+    if (!swatches || !dom.markdown) return;
+
+    swatches.innerHTML = HIGHLIGHT_COLORS.map(c => `
+        <button type="button" class="mc__hl-swatch" data-hl="${c.id}"
+            style="--hl-color:${c.hex};background:${c.hex}"
+            title="${c.label}" aria-label="${c.label}"></button>
+    `).join('');
+
+    swatches.addEventListener('mousedown', (e) => {
+        // 避免点击色块时 textarea 丢掉选区
+        if (e.target.closest('.mc__hl-swatch')) e.preventDefault();
+    });
+
+    swatches.addEventListener('click', (e) => {
+        const btn = e.target.closest('.mc__hl-swatch');
+        if (!btn) return;
+        applyHighlightToSelection(dom.markdown, btn.dataset.hl, t('editor.highlightPlaceholder') || '高亮文字');
+    });
+
+    if (clearBtn) {
+        clearBtn.addEventListener('mousedown', (e) => e.preventDefault());
+        clearBtn.addEventListener('click', () => {
+            applyHighlightToSelection(dom.markdown, null);
         });
     }
 }
