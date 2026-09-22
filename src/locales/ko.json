@@ -26,26 +26,7 @@
     "spacing": "간격",
     "border": "테두리",
     "ratio": "비율",
-    "cover": "표지",
     "watermark": "워터마크"
-  },
-  "cover": {
-    "enabled": "표지 사용",
-    "brand": "브랜드 / 상단",
-    "brandPlaceholder": "예: NASDAQ",
-    "title": "큰 글자 / 중앙",
-    "titlePlaceholder": "핵심 단어",
-    "date": "날짜",
-    "dateAuto": "오늘",
-    "dateNone": "숨기기",
-    "bg": "마카롱 배경",
-    "backEnabled": "뒷표지 사용",
-    "backBrand": "브랜드",
-    "backBrandPlaceholder": "비우면 표지 따름",
-    "backText": "큰 글자",
-    "backTextPlaceholder": "예: 끝",
-    "backSub": "부제",
-    "backSubPlaceholder": "서명 또는 마무리"
   },
   "typo": {
     "h1": "제목",

@@ -74,14 +74,4 @@ export const DEFAULTS = {
     wmColor: 'auto',
     wmOpacity: 0.32,
     wmSize: 'md',
-    // Large-text cover / back cover (macaron)
-    coverEnabled: false,
-    coverBrand: '',
-    coverTitle: '',
-    coverDate: 'auto', // auto | none | YYYY-MM-DD
-    coverBg: 'auto',   // auto | pink | lilac | sky | mint | apricot | cream | #hex
-    backEnabled: false,
-    backBrand: '',
-    backText: '',
-    backSub: '',
 };

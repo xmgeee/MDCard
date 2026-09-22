@@ -3,31 +3,12 @@ import { applyCardVars } from '../settings.js';
 import { paginateMarkdown } from '../paginator.js';
 import { resolveMarkdown, resolveExternalImages } from '../image-upload.js';
 import { renderWatermarkHtml } from '../watermark.js';
-import {
-    renderCoverInnerHtml,
-    frontCoverFromOpts,
-    backCoverFromOpts,
-    fitCoverText,
-} from '../cover.js';
 import { dom } from '../dom.js';
 import { store, readDomSettings } from '../store.js';
 import { showToast } from '../toast.js';
 import { t } from '../i18n.js';
 
 let refreshSeq = 0;
-
-function wrapCard(fmt, familyClass, layoutClass, badge, bodyHtml, wm, extraClass = '', coverBg = '') {
-    const dataBg = coverBg ? ` data-cover-bg="${coverBg}"` : '';
-    return `
-        <div class="mc__card-wrapper">
-            <div class="mc__card mc__card--${fmt} ${familyClass} ${layoutClass} ${extraClass}"${dataBg}>
-                <span class="mc__card-badge">${badge}</span>
-                <div class="mc__card-body">${bodyHtml}</div>
-                ${wm}
-            </div>
-        </div>
-    `;
-}
 
 export async function refresh() {
     const seq = ++refreshSeq;
@@ -67,12 +48,7 @@ export async function refresh() {
 
     if (seq !== refreshSeq) return;
 
-    const frontOn = !!store.opts.coverEnabled;
-    const backOn = !!store.opts.backEnabled;
-    const contentCount = store.pages.length;
-    const total = contentCount + (frontOn ? 1 : 0) + (backOn ? 1 : 0);
-
-    if (total === 0) {
+    if (store.pages.length === 0) {
         dom.cards.innerHTML = '';
         dom.empty.style.display = '';
         dom.exportPng.disabled = true;
@@ -81,58 +57,24 @@ export async function refresh() {
     }
 
     dom.empty.style.display = 'none';
+    const total = store.pages.length;
     const wm = renderWatermarkHtml(store.opts.watermark, store.opts.wmStyle);
-    const parts = [];
-    let pageIdx = 0;
 
-    if (frontOn) {
-        pageIdx += 1;
-        const front = frontCoverFromOpts(store.opts);
-        parts.push(
-            wrapCard(
-                fmt,
-                familyClass,
-                layoutClass,
-                `${pageIdx}/${total}`,
-                renderCoverInnerHtml(front),
-                '',
-                'mc__card--cover',
-                front.bg
-            )
-        );
-    }
+    dom.cards.innerHTML = store.pages
+        .map(
+            (html, i) => `
+        <div class="mc__card-wrapper">
+            <div class="mc__card mc__card--${fmt} ${familyClass} ${layoutClass}">
+                <span class="mc__card-badge">${i + 1}/${total}</span>
+                <div class="mc__card-body">${html}</div>
+                ${wm}
+            </div>
+        </div>
+    `
+        )
+        .join('');
 
-    for (const html of store.pages) {
-        pageIdx += 1;
-        parts.push(wrapCard(fmt, familyClass, layoutClass, `${pageIdx}/${total}`, html, wm));
-    }
-
-    if (backOn) {
-        pageIdx += 1;
-        const back = backCoverFromOpts(store.opts);
-        parts.push(
-            wrapCard(
-                fmt,
-                familyClass,
-                layoutClass,
-                `${pageIdx}/${total}`,
-                renderCoverInnerHtml(back),
-                '',
-                'mc__card--cover mc__card--back',
-                back.bg
-            )
-        );
-    }
-
-    dom.cards.innerHTML = parts.join('');
-
-    dom.cards.querySelectorAll('.mc__card').forEach(el => {
-        applyCardVars(el, store.opts);
-        if (el.dataset.coverBg) {
-            el.style.setProperty('--c-bg', el.dataset.coverBg);
-            fitCoverText(el);
-        }
-    });
+    dom.cards.querySelectorAll('.mc__card').forEach(el => applyCardVars(el, store.opts));
 
     dom.exportPng.disabled = false;
     dom.status.textContent = '';

@@ -38,15 +38,6 @@ export function readDomSettings() {
     opts.wmColor = dom.wmColor?.value || opts.wmColor || 'auto';
     opts.wmOpacity = dom.wmOpacity ? (+dom.wmOpacity.value / 100) : (opts.wmOpacity ?? 0.32);
     opts.wmSize = dom.wmSize?.value || opts.wmSize || 'md';
-    opts.coverEnabled = !!(dom.coverEnabled && dom.coverEnabled.checked);
-    opts.coverBrand = dom.coverBrand?.value ?? opts.coverBrand ?? '';
-    opts.coverTitle = dom.coverTitle?.value ?? opts.coverTitle ?? '';
-    opts.coverDate = dom.coverDate?.value || opts.coverDate || 'auto';
-    opts.coverBg = dom.coverBg?.value || opts.coverBg || 'auto';
-    opts.backEnabled = !!(dom.backEnabled && dom.backEnabled.checked);
-    opts.backBrand = dom.backBrand?.value ?? opts.backBrand ?? '';
-    opts.backText = dom.backText?.value ?? opts.backText ?? '';
-    opts.backSub = dom.backSub?.value ?? opts.backSub ?? '';
 }
 
 export function writeDomSettings() {
@@ -87,18 +78,6 @@ export function writeDomSettings() {
     syncWmSizeButtons(opts.wmSize || 'md');
     syncWmStyleButtons(opts.wmStyle || 'badge');
     syncWmColorButtons(opts.wmColor || 'auto');
-    if (dom.coverEnabled) dom.coverEnabled.checked = !!opts.coverEnabled;
-    if (dom.coverBrand) dom.coverBrand.value = opts.coverBrand || '';
-    if (dom.coverTitle) dom.coverTitle.value = opts.coverTitle || '';
-    if (dom.coverDate) dom.coverDate.value = opts.coverDate || 'auto';
-    if (dom.coverBg) dom.coverBg.value = opts.coverBg || 'auto';
-    if (dom.backEnabled) dom.backEnabled.checked = !!opts.backEnabled;
-    if (dom.backBrand) dom.backBrand.value = opts.backBrand || '';
-    if (dom.backText) dom.backText.value = opts.backText || '';
-    if (dom.backSub) dom.backSub.value = opts.backSub || '';
-    syncCoverBgButtons(opts.coverBg || 'auto');
-    syncCoverDateButtons(opts.coverDate || 'auto');
-    syncCoverPanelVisibility();
 }
 
 function syncWmSizeButtons(size) {
@@ -117,28 +96,4 @@ function syncWmColorButtons(color) {
     document.querySelectorAll('#mc-wm-colors .mc__wm-color').forEach(btn => {
         btn.classList.toggle('mc__wm-color--active', btn.dataset.wmColor === color);
     });
-}
-
-function syncCoverBgButtons(bg) {
-    document.querySelectorAll('#mc-cover-bgs .mc__cover-bg').forEach(btn => {
-        btn.classList.toggle('mc__cover-bg--active', btn.dataset.coverBg === bg);
-    });
-}
-
-function syncCoverDateButtons(mode) {
-    const isNone = mode === 'none' || mode === 'off';
-    const isAuto = !mode || mode === 'auto';
-    document.querySelectorAll('#mc-cover-date-mode .mc__seg-btn').forEach(btn => {
-        const id = btn.dataset.coverDate;
-        btn.classList.toggle('active', (id === 'none' && isNone) || (id === 'auto' && isAuto && !isNone));
-    });
-}
-
-export function syncCoverPanelVisibility() {
-    const on = !!(dom.coverEnabled && dom.coverEnabled.checked);
-    const fields = document.getElementById('mc-cover-fields');
-    if (fields) fields.hidden = !on;
-    const backOn = !!(dom.backEnabled && dom.backEnabled.checked);
-    const backFields = document.getElementById('mc-back-fields');
-    if (backFields) backFields.hidden = !backOn;
 }

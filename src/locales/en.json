@@ -26,26 +26,7 @@
     "spacing": "Spacing",
     "border": "Border",
     "ratio": "Layout",
-    "cover": "Cover",
     "watermark": "Watermark"
-  },
-  "cover": {
-    "enabled": "Front cover",
-    "brand": "Brand / top",
-    "brandPlaceholder": "e.g. NASDAQ",
-    "title": "Headline / center",
-    "titlePlaceholder": "Big word",
-    "date": "Date",
-    "dateAuto": "Today",
-    "dateNone": "Hide",
-    "bg": "Macaron background",
-    "backEnabled": "Back cover",
-    "backBrand": "Brand",
-    "backBrandPlaceholder": "Optional, reuse front",
-    "backText": "Headline",
-    "backTextPlaceholder": "e.g. End",
-    "backSub": "Subtitle",
-    "backSubPlaceholder": "Credit or closing line"
   },
   "typo": {
     "h1": "Heading 1",

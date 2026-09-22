@@ -42,13 +42,4 @@ export const dom = {
     wmOpacity: $('mc-wm-opacity'),
     wmOpacityVal: $('mc-wm-opacity-val'),
     wmSize: $('mc-wm-size-value'),
-    coverEnabled: $('mc-cover-enabled'),
-    coverBrand: $('mc-cover-brand'),
-    coverTitle: $('mc-cover-title'),
-    coverDate: $('mc-cover-date'),
-    coverBg: $('mc-cover-bg'),
-    backEnabled: $('mc-back-enabled'),
-    backBrand: $('mc-back-brand'),
-    backText: $('mc-back-text'),
-    backSub: $('mc-back-sub'),
 };

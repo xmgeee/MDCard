@@ -26,26 +26,7 @@
     "spacing": "間距",
     "border": "邊框",
     "ratio": "畫幅",
-    "cover": "封面",
     "watermark": "浮水印"
-  },
-  "cover": {
-    "enabled": "啟用封面",
-    "brand": "品牌 / 上",
-    "brandPlaceholder": "如：納指",
-    "title": "大字 / 中",
-    "titlePlaceholder": "如：悶著",
-    "date": "日期",
-    "dateAuto": "今天",
-    "dateNone": "隱藏",
-    "bg": "馬卡龍底色",
-    "backEnabled": "啟用封底",
-    "backBrand": "品牌",
-    "backBrandPlaceholder": "可留空沿用封面",
-    "backText": "大字",
-    "backTextPlaceholder": "如：完",
-    "backSub": "副文",
-    "backSubPlaceholder": "署名或收束語"
   },
   "typo": {
     "h1": "標題",

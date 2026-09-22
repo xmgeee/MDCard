@@ -16,8 +16,6 @@ import { exportImages } from '../image-upload.js';
 import { openDraftsPanel } from './drafts-panel.js';
 import { HIGHLIGHT_COLORS, applyHighlightToSelection } from '../highlight.js';
 import { WATERMARK_STYLES, WATERMARK_PRESETS, WATERMARK_COLORS } from '../watermark.js';
-import { MACARON_PRESETS } from '../cover.js';
-import { syncCoverPanelVisibility } from '../store.js';
 import JSZip from 'jszip';
 
 function debounce(fn, ms) {
@@ -260,7 +258,6 @@ export function bindEvents() {
     setupImageUpload(dom.markdown, debouncedRefresh, checkImageFits);
     setupHighlightPanel();
     setupWatermarkPanel(debouncedRefresh);
-    setupCoverPanel(debouncedRefresh);
 
     window.addEventListener('beforeunload', () => {
         persist();
@@ -416,77 +413,6 @@ function setupWatermarkPanel(debouncedRefresh) {
     if (dom.watermark) {
         dom.watermark.addEventListener('input', debouncedRefresh);
     }
-}
-
-function setupCoverPanel(debouncedRefresh) {
-    const bgsEl = document.getElementById('mc-cover-bgs');
-    if (bgsEl) {
-        bgsEl.innerHTML = MACARON_PRESETS.map(p => {
-            const style = p.hex ? `style="--swatch:${p.hex}"` : '';
-            const active = (store.opts.coverBg || 'auto') === p.id ? ' mc__cover-bg--active' : '';
-            return `<button type="button" class="mc__cover-bg${active}" data-cover-bg="${p.id}" title="${p.label}" aria-label="${p.label}" ${style}></button>`;
-        }).join('');
-
-        bgsEl.addEventListener('click', (e) => {
-            const btn = e.target.closest('.mc__cover-bg');
-            if (!btn) return;
-            const id = btn.dataset.coverBg;
-            if (dom.coverBg) dom.coverBg.value = id;
-            store.opts.coverBg = id;
-            bgsEl.querySelectorAll('.mc__cover-bg').forEach(el => {
-                el.classList.toggle('mc__cover-bg--active', el.dataset.coverBg === id);
-            });
-            debouncedRefresh();
-        });
-    }
-
-    const dateMode = document.getElementById('mc-cover-date-mode');
-    if (dateMode) {
-        dateMode.addEventListener('click', (e) => {
-            const btn = e.target.closest('[data-cover-date]');
-            if (!btn) return;
-            const mode = btn.dataset.coverDate;
-            if (dom.coverDate) dom.coverDate.value = mode;
-            store.opts.coverDate = mode;
-            dateMode.querySelectorAll('.mc__seg-btn').forEach(el => {
-                el.classList.toggle('active', el.dataset.coverDate === mode);
-            });
-            debouncedRefresh();
-        });
-    }
-
-    const togglePair = [
-        [dom.coverEnabled, () => {
-            store.opts.coverEnabled = !!(dom.coverEnabled && dom.coverEnabled.checked);
-            syncCoverPanelVisibility();
-            debouncedRefresh();
-        }],
-        [dom.backEnabled, () => {
-            store.opts.backEnabled = !!(dom.backEnabled && dom.backEnabled.checked);
-            syncCoverPanelVisibility();
-            debouncedRefresh();
-        }],
-    ];
-    for (const [el, handler] of togglePair) {
-        if (el) el.addEventListener('change', handler);
-    }
-
-    const textInputs = [
-        [dom.coverBrand, 'coverBrand'],
-        [dom.coverTitle, 'coverTitle'],
-        [dom.backBrand, 'backBrand'],
-        [dom.backText, 'backText'],
-        [dom.backSub, 'backSub'],
-    ];
-    for (const [el, key] of textInputs) {
-        if (!el) continue;
-        el.addEventListener('input', () => {
-            store.opts[key] = el.value;
-            debouncedRefresh();
-        });
-    }
-
-    syncCoverPanelVisibility();
 }
 
 function setupHighlightPanel() {
